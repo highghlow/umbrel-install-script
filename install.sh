@@ -1,0 +1,137 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+UMBREL_VERSION="1.1.2"
+PNPM_VERSION="8.9.2"
+TOR_VERSION="sha256:2ace83f22501f58857fa9b403009f595137fa2e7986c4fda79d82a8119072b6a"
+AUTH_VERSION="sha256:b4a4b37896911a85fb74fa159e010129abd9dff751a40ef82f724ae066db3c2a"
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+step_1() {
+    echo STEP 1/8: Cloning the umbrel repo
+    
+    git clone https://github.com/getumbrel/umbrel /tmp/umbrel
+
+    pushd /tmp/umbrel
+    git checkout -q "$UMBREL_VERSION"
+    echo "Checked out Umbrel v$UMBREL_VERSION"
+    popd
+}
+
+step_2() {
+    echo STEP 2/8: Installing the dependencies
+
+    # Update apt sources
+cat > /tmp/non-free.list<<EOF
+deb http://deb.debian.org/debian bookworm main non-free-firmware
+deb-src http://deb.debian.org/debian bookworm main non-free-firmware
+deb http://deb.debian.org/debian-security bookworm-security main non-free-firmware
+deb-src http://deb.debian.org/debian-security bookworm-security main non-free-firmware
+deb http://deb.debian.org/debian bookworm-updates main non-free-firmware
+deb-src http://deb.debian.org/debian bookworm-updates main non-free-firmware
+EOF
+    
+    sudo cp /tmp/non-free.list /etc/apt/sources.list
+
+    sudo apt-get update --yes
+
+    # Installing curl
+    sudo apt-get install --yes curl
+
+    # Installing docker
+    curl -fsSL https://get.docker.com | sudo sh
+
+    # Installing other packages
+    sudo apt-get install --yes npm sudo nano vim less man iproute2 iputils-ping curl wget ca-certificates dmidecode usbutils python3 fswatch jq rsync git gettext-base gnupg libnss-mdns skopeo
+
+    # Installing pnpm
+    sudo npm install -g pnpm@$PNPM_VERSION
+}
+
+step_3() {
+    echo STEP 3/8: Builing umbreld/ui
+
+    pushd /tmp/umbrel/packages/ui
+
+    rm -rf node_modules || true
+    pnpm install
+    pnpm run build
+
+    popd
+}
+
+step_4() {
+    echo STEP 4/8: Adding the `umbrel` user
+
+    sudo adduser --gecos "" --disabled-password umbrel
+    echo "umbrel:umbrel" | sudo chpasswd
+    sudo usermod -aG sudo umbrel
+}
+
+step_5() {
+    echo STEP 5/8: Cloning umbrel containers
+    
+    sudo mkdir -p /images
+    sudo skopeo copy docker://getumbrel/tor@$TOR_VERSION docker-archive:/images/tor
+    sudo skopeo copy docker://getumbrel/auth-server@$AUTH_VERSION docker-archive:/images/auth
+}
+
+step_6() {
+    echo STEP 6/8: Installing umbreld
+
+    pushd /tmp/umbrel/packages/umbreld
+
+    mkdir -p ./ui
+    cp -r /tmp/umbrel/packages/ui/dist/* ./ui/
+    git apply "$SCRIPT_DIR/remove-docker-installation.diff"
+    sudo npm install tsconfig
+    sudo npm install --omit dev --global
+    sudo umbreld provision-os
+
+    popd
+}
+
+step_7() {
+    echo STEP 7/8 Setting up overlays
+
+    sudo cp -r /tmp/umbrel/packages/os/overlay-common/* /
+    sudo cp -r /tmp/umbrel/packages/os/overlay-amd64/* /
+}
+
+step_8() {
+    echo STEP 8/8 Setting up /data
+
+    # TODO: Mount /data
+
+    sudo mkdir -p /data/umbrel-os/var
+
+    echo "/var/log/ -> /data/umbrel-os/var/log/"
+    sudo cp -r /var/log /data/umbrel-os/var/
+
+    echo "/home/ -> /data/umbrel-os/home/"
+    sudo cp -r /home /data/umbrel-os/
+
+    sudo mount --bind /data/umbrel-os/var/log/ /var/log/
+    sudo mount --bind /data/umbrel-os/home/ /home/
+
+    cp /etc/fstab /tmp/fstab
+    echo "/data/umbrel-os/var/log /var/log none defaults,bind 0 0" >> /tmp/fstab
+    echo "/data/umbrel-os/home /home none defaults,bind 0 0" >> /tmp/fstab
+    sudo cp /tmp/fstab /etc/fstab
+}
+
+step_1
+step_2
+step_3
+step_5
+step_6
+step_7
+step_8
+
+echo "Starting umbrel.service..."
+sudo systemctl start umbrel
+
+curl -s 127.0.0.1 > /dev/null
+
+echo Installation complete!
