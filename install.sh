@@ -130,3 +130,8 @@ sudo systemctl start umbrel
 curl -s 127.0.0.1 > /dev/null
 
 echo Installation complete!
+echo
+echo Go to:
+echo http://umbrel.local
+echo or
+echo http://$(hostname -I)
