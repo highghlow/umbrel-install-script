@@ -114,11 +114,6 @@ step_8() {
 
     sudo mount --bind /data/umbrel-os/var/log/ /var/log/
     sudo mount --bind /data/umbrel-os/home/ /home/
-
-    cp /etc/fstab /tmp/fstab
-    echo "/data/umbrel-os/var/log /var/log none defaults,bind 0 0" >> /tmp/fstab
-    echo "/data/umbrel-os/home /home none defaults,bind 0 0" >> /tmp/fstab
-    sudo cp /tmp/fstab /etc/fstab
 }
 
 step_1
