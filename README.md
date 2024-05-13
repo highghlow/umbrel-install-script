@@ -14,9 +14,8 @@ To install Umbrel using this:
 3. Log in as `root`
 4. Run
 ```
-apt install git sudo
-git clone https://github.com/highghlow/umbrel-install-script
-cd umbrel-install-script
-bash install.sh
+apt update
+apt install curl
+curl -L https://gg.gg/umbrel | bash
 ```
 5. Enjoy!
