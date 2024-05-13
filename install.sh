@@ -97,6 +97,7 @@ step_6() {
 
     cat /etc/fstab >> /tmp/fstab.BAK
 
+    echo >> /tmp/fstab.BAK
     sudo cp /tmp/fstab.BAK /etc/fstab # Untested
 
     popd
