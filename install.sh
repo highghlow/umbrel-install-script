@@ -116,6 +116,10 @@ step_8() {
     sudo mount --bind /data/umbrel-os/home/ /home/
 }
 
+if [ $# -gt 0 ]; then
+  $1
+fi
+
 step_1
 step_2
 step_3
