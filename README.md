@@ -10,7 +10,7 @@ An unofficial installation script for [Umbrel](https://github.com/getumbrel/umbr
 To install Umbrel using this:
 
 1. Read [the warnings](#warnings) carefully
-2. Do a fresh debian installation (Do not make a user account. Only use `root`)
+2. Do a fresh debian installation (Make a user account named anything but `umbrel`)
 3. Log in as `root`
 4. Run
 ```
