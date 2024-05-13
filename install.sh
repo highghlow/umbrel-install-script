@@ -62,10 +62,14 @@ step_3() {
 }
 
 step_4() {
-
-    sudo adduser --gecos "" --disabled-password umbrel
-    echo "umbrel:umbrel" | sudo chpasswd
     echo STEP 4/8: Adding the umbrel user
+
+    if id umbrel; then
+      echo "User umbrel already exists"
+    else
+      sudo adduser --gecos "" --disabled-password umbrel
+      echo "umbrel:umbrel" | sudo chpasswd
+    fi
     sudo usermod -aG sudo umbrel
 }
 
