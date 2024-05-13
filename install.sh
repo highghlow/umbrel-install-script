@@ -108,7 +108,7 @@ step_7() {
     echo >> /tmp/fstab.BAK
     cat /etc/fstab >> /tmp/fstab.BAK
 
-    sudo cp /tmp/fstab.BAK /etc/fstab # Untested
+    sudo cp /tmp/fstab.BAK /etc/fstab
 }
 
 step_8() {
