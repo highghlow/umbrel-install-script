@@ -92,13 +92,7 @@ step_6() {
     sudo npm install tsconfig
     sudo npm install --omit dev --global
 
-    cp /etc/fstab /tmp/fstab.BAK
     sudo umbreld provision-os
-
-    cat /etc/fstab >> /tmp/fstab.BAK
-
-    echo >> /tmp/fstab.BAK
-    sudo cp /tmp/fstab.BAK /etc/fstab # Untested
 
     popd
 }
@@ -106,8 +100,15 @@ step_6() {
 step_7() {
     echo STEP 7/8 Setting up overlays
 
+    cp /etc/fstab /tmp/fstab.BAK
+
     sudo cp -r /tmp/umbrel/packages/os/overlay-common/* /
     sudo cp -r /tmp/umbrel/packages/os/overlay-amd64/* /
+
+    echo >> /tmp/fstab.BAK
+    cat /etc/fstab >> /tmp/fstab.BAK
+
+    sudo cp /tmp/fstab.BAK /etc/fstab # Untested
 }
 
 step_8() {
