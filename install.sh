@@ -91,7 +91,13 @@ step_6() {
     git apply "$SCRIPT_DIR/remove-docker-installation.diff"
     sudo npm install tsconfig
     sudo npm install --omit dev --global
+
+    cp /etc/fstab /tmp/fstab.BAK
     sudo umbreld provision-os
+
+    cat /etc/fstab >> /tmp/fstab.BAK
+
+    sudo cp /tmp/fstab.BAK /etc/fstab # Untested
 
     popd
 }
