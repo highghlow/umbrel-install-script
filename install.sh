@@ -62,10 +62,10 @@ step_3() {
 }
 
 step_4() {
-    echo STEP 4/8: Adding the `umbrel` user
 
     sudo adduser --gecos "" --disabled-password umbrel
     echo "umbrel:umbrel" | sudo chpasswd
+    echo STEP 4/8: Adding the umbrel user
     sudo usermod -aG sudo umbrel
 }
 
