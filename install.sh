@@ -129,25 +129,25 @@ step_8() {
 }
 
 if [ $# -gt 0 ]; then
-  $1
+    $1
+else
+    step_1
+    step_2
+    step_3
+    step_5
+    step_6
+    step_7
+    step_8
+
+    echo "Starting umbrel.service..."
+    sudo systemctl start umbrel
+
+    curl -s 127.0.0.1 > /dev/null
+
+    echo Installation complete!
+    echo
+    echo Go to:
+    echo http://umbrel.local
+    echo or
+    echo http://$(hostname -I)
 fi
-
-step_1
-step_2
-step_3
-step_5
-step_6
-step_7
-step_8
-
-echo "Starting umbrel.service..."
-sudo systemctl start umbrel
-
-curl -s 127.0.0.1 > /dev/null
-
-echo Installation complete!
-echo
-echo Go to:
-echo http://umbrel.local
-echo or
-echo http://$(hostname -I)
