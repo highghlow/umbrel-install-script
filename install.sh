@@ -8,6 +8,18 @@ AUTH_VERSION="sha256:b4a4b37896911a85fb74fa159e010129abd9dff751a40ef82f724ae066d
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
+step_0() {
+    if cat /etc/fstab | grep -E "/data/? "; then
+	sleep 0
+    else
+	echo "/data mount not found in fstab"
+	echo "You should have a separate partition for /data. It is where all your Umbrel's data will be stored"
+	echo "Add /data to fstab, mount it and then rerun the script"
+	exit 1
+    fi
+
+}
+
 step_1() {
     echo STEP 1/8: Cloning the umbrel repo
     
@@ -131,6 +143,7 @@ step_8() {
 if [ $# -gt 0 ]; then
     $1
 else
+    step_0
     step_1
     step_2
     step_3
