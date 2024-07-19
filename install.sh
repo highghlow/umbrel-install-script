@@ -100,7 +100,7 @@ step_6() {
 
     mkdir -p ./ui
     cp -r /tmp/umbrel/packages/ui/dist/* ./ui/
-    git apply "$SCRIPT_DIR/remove-docker-installation.diff"
+    patch source/modules/provision/provision.ts "$SCRIPT_DIR/remove-docker-installation.diff"
     sudo npm install tsconfig
     sudo npm install --omit dev --global
 
