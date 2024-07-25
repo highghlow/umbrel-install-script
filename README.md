@@ -5,6 +5,7 @@ An unofficial installation script for [Umbrel](https://github.com/getumbrel/umbr
 1. This is unofficial. Do not report issues you discovered while using this to the Umbrel Team. Report them here
 2. **Only** use this on a fresh debian installation. It **will** break anything you had there before
 3. You should have a separate `/data` partition. Allocate 7.5GB to root and everything else to `/data`
+4. Updates are broken and I don't know if it's possible to fix them
 
 # Quickstart
 To install Umbrel using this:
