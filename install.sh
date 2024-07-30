@@ -89,8 +89,11 @@ step_5() {
     echo STEP 5/8: Cloning umbrel containers
     
     sudo mkdir -p /images
-    sudo skopeo copy docker://getumbrel/tor@$TOR_VERSION docker-archive:/images/tor
-    sudo skopeo copy docker://getumbrel/auth-server@$AUTH_VERSION docker-archive:/images/auth
+    sudo docker pull getumbrel/tor@$TOR_VERSION
+    sudo docker save -o /images/tor.tar getumbrel/tor@$TOR_VERSION
+
+    sudo docker pull getumbrel/auth-server@$AUTH_VERSION
+    sudo docker save -o /images/auth.tar getumbrel/auth-server@$AUTH_VERSION
 }
 
 step_6() {
